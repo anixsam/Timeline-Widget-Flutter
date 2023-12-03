@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:list_wheel_scroll_view_nls/list_wheel_scroll_view_nls.dart';
 
 class Booking {
@@ -25,6 +26,9 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
     initialItem: 0,
   );
 
+  final Color bookedColor = Colors.red;
+  final Color availableColor = Colors.green;
+
   int currentScale = 1;
 
   List<Booking> booked = [
@@ -39,8 +43,9 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
   int numberOfSubdivision = 1;
 
   double totalWidth = 100;
-
   double width = 80;
+
+  double eventBarHeight = 8;
 
   @override
   void initState() {
@@ -50,11 +55,8 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
 
     totalWidth = (numberOfSubdivision + 1) * width;
 
-    print("width: $width");
-
-    scrollController.addListener(() {});
-
     _list_to_display = getTimes();
+
     // finding first available slot
     int firstAvailableSlot = getNextAvailableTime(0, _list_to_display.length);
 
@@ -117,8 +119,6 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
   }
 
   int getNextAvailableTime(int start, int end) {
-    print("start: $start end: $end");
-
     List<String> _availableTimes = [];
 
     for (int i = start; i < end; i++) {
@@ -136,10 +136,7 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
           int startIndex = _list_to_display.indexOf(element.startTime);
           int endIndex = _list_to_display.indexOf(element.endTime);
 
-          print("startIndex: $startIndex endIndex: $endIndex");
-
           for (int i = startIndex; i < endIndex; i++) {
-            print("i: ${_list_to_display[i]}");
             _availableTimes.remove(_list_to_display[i]);
           }
         });
@@ -160,10 +157,10 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
     String time = _list_to_display[i];
 
     if (time.split(":")[1] == "00") {
-      return 25;
+      return 20;
     } else {
       if (isAlternateBars(i)) {
-        return 25;
+        return 20;
       } else {
         return 15;
       }
@@ -203,9 +200,15 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Container(
-            height: 5,
-            width: (width / 2) + 1,
-            color: secondColor,
+            height: eventBarHeight,
+            width: (width / 2) + 5,
+            decoration: BoxDecoration(
+              color: secondColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(5),
+                bottomLeft: Radius.circular(5),
+              ),
+            ),
           )
         ],
       );
@@ -214,9 +217,15 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            height: 5,
-            width: (width / 2) + 1,
-            color: secondColor,
+            height: eventBarHeight,
+            width: (width / 2) + 5,
+            decoration: BoxDecoration(
+              color: secondColor,
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(5),
+                bottomRight: Radius.circular(5),
+              ),
+            ),
           )
         ],
       );
@@ -225,12 +234,12 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            height: 5,
+            height: eventBarHeight,
             width: (width / 2),
             color: firstColor,
           ),
           Container(
-            height: 5,
+            height: eventBarHeight,
             width: (width / 2),
             color: secondColor,
           )
@@ -244,9 +253,13 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
         children: [
           timelineContainer,
           Container(
-            width: 2,
+            margin: const EdgeInsets.all(5),
+            width: 3,
             height: getBarHeight(i).toDouble(),
-            color: i == currentIndex ? Colors.black : Colors.grey,
+            decoration: BoxDecoration(
+              color: i == currentIndex ? Colors.black : Colors.grey,
+              borderRadius: BorderRadius.circular(5),
+            ),
           ),
           Text(
             getTimeText(_list_to_display[i]),
@@ -283,9 +296,8 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
       int startIndex = _list_to_display.indexOf(startTime);
       int endIndex = _list_to_display.indexOf(endTime);
 
-      // print("startIndex: $startIndex endIndex: $endIndex");
       for (int i = startIndex + 1; i < endIndex; i++) {
-        _map[_list_to_display[i]] = getTimeline(Colors.red, Colors.red, i);
+        _map[_list_to_display[i]] = getTimeline(bookedColor, bookedColor, i);
       }
 
       // Checking if start time is already end time of some other booking
@@ -293,9 +305,9 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
           booked.where((element) => element.endTime == startTime).toList();
 
       if (_booked.isNotEmpty) {
-        _map[startTime] = getTimeline(Colors.red, Colors.red, startIndex);
+        _map[startTime] = getTimeline(bookedColor, bookedColor, startIndex);
       } else {
-        _map[startTime] = getTimeline(Colors.grey, Colors.red, startIndex);
+        _map[startTime] = getTimeline(availableColor, bookedColor, startIndex);
       }
 
       // Checking if end time is already start time of some other booking
@@ -303,9 +315,9 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
           booked.where((element) => element.startTime == endTime).toList();
 
       if (_booked.isNotEmpty) {
-        _map[endTime] = getTimeline(Colors.red, Colors.red, endIndex);
+        _map[endTime] = getTimeline(bookedColor, bookedColor, endIndex);
       } else {
-        _map[endTime] = getTimeline(Colors.red, Colors.grey, endIndex);
+        _map[endTime] = getTimeline(bookedColor, availableColor, endIndex);
       }
     }
 
@@ -315,7 +327,7 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
           return _map[e]!;
         } else {
           return getTimeline(
-              Colors.grey, Colors.grey, _list_to_display.indexOf(e));
+              availableColor, availableColor, _list_to_display.indexOf(e));
         }
       },
     ).toList();
@@ -353,6 +365,7 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
           onSelectedItemChanged: (index) {
             setState(() {
               currentIndex = index;
+              HapticFeedback.selectionClick();
               widget.onTimeSelected(getTimeText(_list_to_display[index]));
             });
           },
