@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:timeline_sample/widgets/timeline.dart';
-import 'package:wheel_chooser/wheel_chooser.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +23,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
+              SizedBox(
                   height: 50, width: 200, child: Text("Selected Time: $text")),
               const Icon(
                 Icons.arrow_drop_down,

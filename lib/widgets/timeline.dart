@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:list_wheel_scroll_view_nls/list_wheel_scroll_view_nls.dart';
+import 'package:timeline_sample/widgets/horizontal_wheel_scroll.dart';
 
 class Booking {
   final String startTime;
@@ -12,9 +12,9 @@ class Booking {
 }
 
 class CustomTimeLine extends StatefulWidget {
-  CustomTimeLine({super.key, required this.onTimeSelected});
+  const CustomTimeLine({super.key, required this.onTimeSelected});
 
-  Function(String time) onTimeSelected;
+  final Function(String time) onTimeSelected;
 
   @override
   State<CustomTimeLine> createState() => _CustomTimeLineState();
@@ -34,8 +34,9 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
   List<Booking> booked = [
     Booking(startTime: "00:00", endTime: "01:00"),
     Booking(startTime: "01:00", endTime: "02:00"),
-    Booking(startTime: "08:00", endTime: "09:00"),
-  ] as List<Booking>;
+    Booking(startTime: "08:00", endTime: "09:30"),
+    Booking(startTime: "23:00", endTime: "24:00"),
+  ];
 
   List<String> _list_to_display = [];
 
@@ -220,7 +221,7 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
             height: eventBarHeight,
             width: (width / 2) + 5,
             decoration: BoxDecoration(
-              color: secondColor,
+              color: firstColor,
               borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(5),
                 bottomRight: Radius.circular(5),
@@ -332,7 +333,7 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
       },
     ).toList();
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
       child: GestureDetector(
         onScaleUpdate: (details) {
@@ -355,7 +356,7 @@ class _CustomTimeLineState extends State<CustomTimeLine> {
             },
           );
         },
-        child: ListWheelScrollViewX(
+        child: HorizontalListWheelScrollView(
           controller: scrollController,
           physics: const FixedExtentScrollPhysics(),
           scrollDirection: Axis.horizontal,
