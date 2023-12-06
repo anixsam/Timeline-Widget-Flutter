@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  event_booking_timeline:
+    dependency: "direct main"
+    description:
+      name: event_booking_timeline
+      sha256: "782e0dbdcce1624e0c7659d43903cafbd88ac7ebf255e4367e76397c67bfa6ba"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.7"
   fake_async:
     dependency: transitive
     description:
@@ -186,3 +194,4 @@ packages:
     version: "0.3.0"
 sdks:
   dart: ">=3.2.2 <4.0.0"
+  flutter: ">=1.17.0"

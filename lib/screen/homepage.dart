@@ -1,4 +1,8 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:timeline_sample/exceptions/exception.dart';
 import 'package:timeline_sample/widgets/timeline.dart';
 
 class HomePage extends StatefulWidget {
@@ -10,6 +14,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String text = "";
+
+  bool isSnackBarActive = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +43,22 @@ class _HomePageState extends State<HomePage> {
                         text = time;
                       },
                     );
+                  },
+                  onError: (dynamic e) {
+                    if (e is DurationException) {
+                      if (!isSnackBarActive) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(e.message),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                        isSnackBarActive = true;
+                        Future.delayed(const Duration(seconds: 1), () {
+                          isSnackBarActive = false;
+                        });
+                      }
+                    }
                   },
                 ),
               ),
